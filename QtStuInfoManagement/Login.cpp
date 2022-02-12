@@ -1,7 +1,7 @@
 #include<QDebug>
 #include "Login.h"
 
-
+int Login::loginNum=1;
 Login::Login(QWidget *parent)
     : QWidget(parent)
 {
@@ -79,9 +79,13 @@ void Login::onbtnStart()
 
 void Login::timerEvent(QTimerEvent* event)
 {
+
     if(event->timerId()==timerId)
     {
-        static int count=countDown;
+
+        static int count = countDown;
+        qDebug()<<"-------1"<< count;
+
         qDebug("timer:%d",count);
         if(count!=0)
         {
@@ -90,15 +94,17 @@ void Login::timerEvent(QTimerEvent* event)
         QString num=QString::number(count);
         //label3->setText(num);
         if(count == 0){
+            count=loginNum*time;
             btnOK->setText(QString(tr("确定")));
             btnOK->setDisabled(false);
             this->initial();
             killTimer(timerId);
-            count=countDown;
+            qDebug()<<"-------2"<< count;
         }
         else
             btnOK->setText(QString(tr("确定%1秒")).arg(num));
     }
+
 }
 
 
@@ -106,7 +112,6 @@ void Login::timerEvent(QTimerEvent* event)
 void Login::on_Login()
 {
     static int cout=0;
-    static int loginNum=0;
     int  i = 1;
     QString user = name->text();
     QString pass = password->text();
@@ -130,19 +135,19 @@ void Login::on_Login()
     else{
         cout++;
         i = 5-cout;
-
+        time=5;
         if(i<=0)
         {
-            loginNum = loginNum + 1;
-            countDown = loginNum*60;
 
+            countDown = loginNum*time;
+            loginNum = loginNum + 1;
             QMessageBox msgBox;
             msgBox.setText(QString("由于操作失败多次,系统暂禁止登录\n请%1分钟之后再试试!").arg(loginNum));
             msgBox.exec();
             disconnect(btnOK,SIGNAL(clicked),this,SLOT(on_Login()));
             btnOK->setDisabled(true);
-            this->onbtnStart();
             cout=0;
+            this->onbtnStart();
         }else
         {
             p = QString("账户或密码错误,还剩%1次机会!").arg(i);

@@ -57,6 +57,8 @@ public:
     ~Login();
     int timerId;
     int countDown;
+    int time;
+    static int loginNum;
     virtual void timerEvent(QTimerEvent* event);
 };
 #endif // LOGIN_H
