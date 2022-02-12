@@ -9,7 +9,7 @@ Login::Login(QWidget *parent)
     setUI();
     connect(btnCLOSE,SIGNAL(clicked()),this,SLOT(close()));
     connect(btnOK,SIGNAL(clicked()),this,SLOT(on_Login()));
-    initialSignal();
+    initial();
     setWindowTitle("StuInfo System");
 
 }
@@ -53,29 +53,66 @@ void Login::setUI()
     setLayout(page);//完成布局
 }
 
-void Login::initialSignal()
+void Login::initial()
 {
     this->update();
     this->repaint();
+    name->setText("");
+    password->setText("");
+
 }
+
 
 
 void Login::exitLogin()
 {
     this->show();
-    this->initialSignal();
-    name->setText("");
-    password->setText("");
+    this->initial();
 }
+
+
+
+void Login::onbtnStart()
+{
+    timerId=startTimer(1000); //1000 =>set 1s   60000=>set 1min
+}
+
+void Login::timerEvent(QTimerEvent* event)
+{
+    if(event->timerId()==timerId)
+    {
+        static int count=countDown;
+        qDebug("timer:%d",count);
+        if(count!=0)
+        {
+            count--;
+        }
+        QString num=QString::number(count);
+        //label3->setText(num);
+        if(count == 0){
+            btnOK->setText(QString(tr("确定")));
+            btnOK->setDisabled(false);
+            this->initial();
+            killTimer(timerId);
+            count=countDown;
+        }
+        else
+            btnOK->setText(QString(tr("确定%1秒")).arg(num));
+    }
+}
+
+
 
 void Login::on_Login()
 {
-    static int cout = 0;
+    static int cout=0;
+    static int loginNum=0;
     int  i = 1;
     QString user = name->text();
     QString pass = password->text();
     QString p="";
     int lenth = pass.count();
+    int len = user.count();
     for(int i=0;i<lenth;i++)p.append("*");
     password->setText(p);
     if(user=="1"&&pass=="1"){
@@ -84,34 +121,35 @@ void Login::on_Login()
        msgBox.exec();
        this->hide();
        emit showMainSignal();
+    }else if(len==0||lenth==0)
+    {
+        QMessageBox msgBox;
+        msgBox.setText("账户或密码为空!\n禁止登录");
+        msgBox.exec();
     }
     else{
         cout++;
         i = 5-cout;
 
-        if(cout>=5)
+        if(i<=0)
         {
+            loginNum = loginNum + 1;
+            countDown = loginNum*60;
+
             QMessageBox msgBox;
-            msgBox.setText("由于操作失败多次,系统暂禁止登录\n");
+            msgBox.setText(QString("由于操作失败多次,系统暂禁止登录\n请%1分钟之后再试试!").arg(loginNum));
             msgBox.exec();
             disconnect(btnOK,SIGNAL(clicked),this,SLOT(on_Login()));
             btnOK->setDisabled(true);
+            this->onbtnStart();
+            cout=0;
         }else
         {
-            p = QString("登录失败,还剩%1次机会").arg(i);
+            p = QString("账户或密码错误,还剩%1次机会!").arg(i);
             QMessageBox msgBox;
             msgBox.setText(p);
             msgBox.exec();
         }
-    }
-
-    int len = user.count();
-    if(len==0||lenth==0)
-    {
-        QMessageBox msgBox;
-        msgBox.setText("未输入内容\n禁止登录");
-        msgBox.exec();
-        cout--;
     }
    // label3->setText(p);
 }

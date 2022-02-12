@@ -25,6 +25,10 @@
 #include <QLayout>
 
 
+#include <QTimer>
+#include <QTime>
+#include <QTimerEvent>
+
 class Login : public QWidget
 {
     Q_OBJECT
@@ -39,15 +43,20 @@ private:
 signals:
   void showMainSignal();
 
-
 private slots:
     void setUI();
-    void initialSignal();
+    void initial();
     void on_Login();
 
     void exitLogin();
+
+    void onbtnStart();
+
 public:
     Login(QWidget *parent = nullptr);
     ~Login();
+    int timerId;
+    int countDown;
+    virtual void timerEvent(QTimerEvent* event);
 };
 #endif // LOGIN_H
