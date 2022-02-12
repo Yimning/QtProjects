@@ -60,7 +60,6 @@ void Login::initialSignal()
 }
 
 
-
 void Login::exitLogin()
 {
     this->show();
