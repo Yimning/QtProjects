@@ -11,7 +11,6 @@ Login::Login(QWidget *parent)
     connect(btnOK,SIGNAL(clicked()),this,SLOT(on_Login()));
     initial();
     setWindowTitle("StuInfo System");
-
 }
 
 Login::~Login()
@@ -126,6 +125,7 @@ void Login::on_Login()
        msgBox.exec();
        this->hide();
        emit showMainSignal();
+
     }else if(len==0||lenth==0)
     {
         QMessageBox msgBox;
@@ -135,14 +135,13 @@ void Login::on_Login()
     else{
         cout++;
         i = 5-cout;
-        time=5;
+        time=60;
         if(i<=0)
         {
-
             countDown = loginNum*time;
             loginNum = loginNum + 1;
             QMessageBox msgBox;
-            msgBox.setText(QString("由于操作失败多次,系统暂禁止登录\n请%1分钟之后再试试!").arg(loginNum));
+            msgBox.setText(QString("由于操作失败多次,系统暂禁止登录\n请%1分钟之后再试试!").arg(loginNum-1));
             msgBox.exec();
             disconnect(btnOK,SIGNAL(clicked),this,SLOT(on_Login()));
             btnOK->setDisabled(true);
